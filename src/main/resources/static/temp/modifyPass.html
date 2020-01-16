@@ -1,0 +1,23 @@
+<div style="margin: 15px;">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">旧密码</label>
+			<div class="layui-input-inline">
+				<input type="password" name="oldpassword" id="oldpassword" lay-verify="required" autocomplete="off" placeholder="请输入老密码" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">新密码</label>
+			<div class="layui-input-inline">
+				<input type="password" name="newpassword" id="newpassword" lay-verify="required" autocomplete="off" placeholder="请输入新密码" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">新密码确认</label>
+			<div class="layui-input-inline">
+				<input type="password" name="repassword" id="repassword" lay-verify="required|pass" autocomplete="off" placeholder="确认新密码" class="layui-input">
+			</div>
+		</div>
+		<button lay-filter="edit" lay-submit style="display: none;"></button>
+	</form>
+</div>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>按日代发订单统计</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap-table.min.css">
+		<link rel="stylesheet" href="css/bootstrap-datepicker.min.css" />
+		<link rel="stylesheet" href="plugins/layui/css/layui.css" media="all" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/bootstrap-table.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap-table-zh-CN.js"></script>
+		<script type="text/javascript" src="js/moment.js"></script>
+		<script type="text/javascript" src="js/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap-datepicker.zh-CN.min.js"></script>
+		<script type="text/javascript" src="plugins/layui/layui.js"></script>
+	</head>
+	<style>
+		body {
+			position: relative;
+			padding-top: 40px;
+		}
+	</style>
+
+	<body>
+		<div class="container" style="margin: 0;">
+			<div id="toolbar" class="row">
+				<div class="col-lg-3">
+					<div class='input-group date'>
+						<label class="input-group-addon">开始日期</label>
+						<input type='text' class="form-control" id="beginDate" />
+						<span class="input-group-addon">  
+	                    <span class="glyphicon glyphicon-calendar"></span>
+						</span>
+					</div>
+				</div>
+
+				<div class="col-lg-3">
+					<div class='input-group date'>
+						<label class="input-group-addon">结束日期</label>
+						<input type='text' class="form-control" id="endDate" />
+						<span class="input-group-addon">  
+	                    <span class="glyphicon glyphicon-calendar"></span>
+						</span>
+					</div>
+				</div>
+				<div class="col-lg-2">
+					<button class="btn btn-success" id="btnRefresh">刷新</button>
+					<button class="btn btn-success" id="btnLine">折线图</button>
+				</div>
+			</div>
+
+			<table id="table">
+
+			</table>
+
+			<div id="myModal" class="modal hide fade">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">x</button>
+					<h3>对话框标题</h3>
+				</div>
+				<div class="modal-body">
+					<p>对话框主体</p>
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="btn" data-dismiss="modal">取消</a>
+					<a href="#" class="btn btn-primary" data-dismiss="modal">确定</a>
+				</div>
+			</div>
+		</div>
+		<script>
+			layui.use(['form', 'layedit', 'laydate', 'upload'], function() {
+				var form = layui.form(),
+					layer = layui.layer,
+					layedit = layui.layedit,
+					laydate = layui.laydate,
+					$ = layui.jquery;
+				var $table = $('#table');
+				$(".date").datepicker({
+					format: "yyyy-mm-dd",
+					autoclose: 'true',
+					todayBtn: 'linked',
+					language: 'zh-CN'
+				});
+				var now = new Date();
+				var today = now.getFullYear() + '-' + formatdate(now.getMonth() + 1) + '-' + formatdate(now.getDate());
+				var first = now.getFullYear() + '-' + formatdate(now.getMonth() + 1) + '-01';
+				$('#beginDate').val(first);
+				$('#endDate').val(today);
+
+				$('#table').bootstrapTable({
+					url: 'sendApplyQuery/groupByDate',
+					height: '550',
+					sidePagination: 'server',
+					pagination: 'true',
+					pageList: '[5, 10, 20, 50, 100, 200]',
+					toolbar: '#toolbar',
+					striped: 'true',
+					showFooter: 'true',
+					queryParamsType: 'limit',
+					queryParams: function(params) {
+						return {
+							limit: params.limit,
+							offset: params.offset,
+							search: params.search,
+							order: params.sortOrder,
+							sort: params.sort,
+							begindate: $('#beginDate').val(),
+							enddate: $('#endDate').val()
+						};
+					},
+					columns: [
+						[{
+								field: 'username',
+								title: '日期',
+								footerFormatter: totalTextFormatter
+							},
+							{
+								field: 'normal',
+								title: '正常',
+								footerFormatter: sumFormatter
+							},
+							{
+								field: 'error',
+								title: '异常',
+								footerFormatter: sumFormatter
+							},
+							{
+								field: 'count',
+								title: '合计',
+								footerFormatter: sumFormatter
+							}
+						]
+					]
+				})
+
+				$('#btnRefresh').click(function() {
+					$('#table').bootstrapTable('refresh');
+				})
+				
+				
+				$('#btnLine').click(function(){
+					tabledata = $('#table').bootstrapTable('getData');
+					if(tabledata.length == 0){
+						layer.msg('没有数据');
+						return;
+					}
+					sessionStorage.tableDate = JSON.stringify(tabledata);
+					layer.open({
+                					type:2,
+                					content:'line.html',
+                					area: ['700px', '420px']
+                				})
+				})
+				
+			})
+			
+			
+			
+
+			function totalTextFormatter(data) {
+				return '合计';
+			}
+
+			function sumFormatter(data) {
+				field = this.field;
+				var total_sum = data.reduce(function(sum, row) {
+					return(sum) + (row[field] || 0);
+				}, 0);
+				return total_sum;
+			}
+
+			
+
+			function formatdate(val) {
+				if(val < 10) {
+					return '0' + val;
+				} else {
+					return val;
+				}
+			}
+		</script>
+	</body>
+
+</html>

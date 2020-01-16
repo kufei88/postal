@@ -1,0 +1,432 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>零创邮</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+
+		<link rel="stylesheet" href="plugins/layui/css/layui.css" media="all" />
+		<link rel="stylesheet" href="css/global.css" media="all">
+		<link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css">
+
+	</head>
+
+	<body>
+		<div class="layui-layout layui-layout-admin" style="border-bottom: solid 5px #1aa094;">
+			<div class="layui-header header header-demo">
+				<div class="layui-main">
+					<div class="admin-login-box">
+						<a class="logo" style="left: 0;" href="">
+							<img src="images/IMG_0836.JPG" style="width: 50px;"/><span style="font-size: 22px;margin-left: 5px;">零创邮</span>
+						</a>
+						<div class="admin-side-toggle">
+							<i class="fa fa-bars" aria-hidden="true"></i>
+						</div>
+						<div class="admin-side-full">
+							<i class="fa fa-life-bouy" aria-hidden="true"></i>
+						</div>
+					</div>
+					<ul class="layui-nav admin-header-item">
+						<li class="layui-nav-item">
+							<a id="FAQ" target="_blank">常见问题</a>
+						</li>
+						<li class="layui-nav-item">
+							<a href="https://m.kuaidi100.com/" target="_blank">快递查询</a>
+						</li>
+
+						<li class="layui-nav-item">
+							<a href="javascript:;" class="admin-header-user">
+								<img src="images/0.jpg" />
+								<span id="username">beginner</span>
+							</a>
+							<dl class="layui-nav-child">
+								<dd>
+									<a href="javascript:;" id="modifyInformation"><i class="fa fa-user-circle" aria-hidden="true"></i> 个人信息</a>
+								</dd>
+								<dd>
+									<a href="javascript:;" id="modifyPass"><i class="fa fa-gear" aria-hidden="true"></i> 修改密码</a>
+								</dd>
+								
+								<dd>
+									<a href="login.html"><i class="fa fa-sign-out" aria-hidden="true"></i> 注销</a>
+								</dd>
+							</dl>
+						</li>
+					</ul>
+					<ul class="layui-nav admin-header-item-mobile">
+						<li class="layui-nav-item">
+							<a href="login.html"><i class="fa fa-sign-out" aria-hidden="true"></i> 注销</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="layui-side layui-bg-black" id="admin-side">
+				<div class="layui-side-scroll" id="admin-navbar-side" lay-filter="side"></div>
+			</div>
+			<div class="layui-body" style="bottom: 0;border-left: solid 2px #1AA094;" id="admin-body">
+				<div class="layui-tab admin-nav-card layui-tab-brief" lay-filter="admin-tab">
+					<ul class="layui-tab-title">
+						<li class="layui-this">
+							<i class="fa fa-dashboard" aria-hidden="true"></i>
+							<cite>首页</cite>
+						</li>
+					</ul>
+					<div class="layui-tab-content" style="min-height: 150px; padding: 5px 0 0 0;">
+						<div class="layui-tab-item layui-show">
+							<iframe src=""></iframe>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-footer footer footer-demo" id="admin-footer">
+				<div class="layui-main">
+					<p>2016 &copy;
+						<a href="http://m.zhengjinfan.cn/">m.zhengjinfan.cn/</a> LGPL license
+					</p>
+				</div>
+			</div>
+			<div class="site-tree-mobile layui-hide">
+				<i class="layui-icon">&#xe602;</i>
+			</div>
+			<div class="site-mobile-shade"></div>
+
+			<!--锁屏模板 start-->
+			<script type="text/template" id="lock-temp">
+				<div class="admin-header-lock" id="lock-box">
+					<div class="admin-header-lock-img">
+						<img src="images/0.jpg" />
+					</div>
+					<div class="admin-header-lock-name" id="lockUserName">beginner</div>
+					<input type="text" class="admin-header-lock-input" value="输入密码解锁.." name="lockPwd" id="lockPwd" />
+					<button class="layui-btn layui-btn-small" id="unlock">解锁</button>
+				</div>
+			</script>
+			<!--锁屏模板 end -->
+
+			<script type="text/javascript" src="plugins/layui/layui.js"></script>
+			<script type="text/javascript" src="datas/nav.js"></script>
+			<script src="js/index.js"></script>
+			<script>
+				layui.use(['layer','form'], function() {
+					var $ = layui.jquery,
+						form = layui.form(),
+						layerTips = parent.layer === undefined ? layui.layer : parent.layer, //获取父窗口的layer对象
+						layer = layui.layer;
+
+					$.ajax({
+						type: "get",
+						url: "users/getLoginUser",
+						async: true,
+						success: function(data) {
+							if(data.result) {
+								$('#username').text(data.result);
+							} else {
+								layer.alert('登录已过期', {
+									skin: 'layui-layer-molv' //样式类名
+										,
+									closeBtn: 0
+								}, function() {
+									top.location.href = "login.html";
+								});
+
+							}
+						}
+					});
+					var addBoxIndex = -1;
+					$('#modifyPass').click(function() {
+						if(addBoxIndex !== -1)
+							return;
+						$.get('temp/modifyPass.html', null, function(form) {
+							addBoxIndex = layer.open({
+								type: 1,
+								title: '修改密码',
+								content: form,
+								btn: ['保存', '取消'],
+								shade: false,
+								offset: ['100px', '30%'],
+								area: ['500px', '320px'],
+								zIndex: 19890000,
+								maxmin: true,
+								yes: function(index) {
+									//触发表单的提交事件
+									$('form.layui-form').find('button[lay-filter=edit]').click();
+								},
+								full: function(elem) {
+									var win = window.top === window.self ? window : parent.window;
+									$(win).on('resize', function() {
+										var $this = $(this);
+										elem.width($this.width()).height($this.height()).css({
+											top: 0,
+											left: 0
+										});
+										elem.children('div.layui-layer-content').height($this.height() - 95);
+									});
+								},
+								success: function(layero, index) {
+									//console.log(layui);
+									//弹出窗口成功后渲染表单
+									var form = layui.form();
+									
+									
+
+									form.render();
+									
+									form.verify({
+										pass:function(value,item){
+											if(!($('#newpassword').val() == $('#repassword').val())){
+												return "两次密码不一致";
+												console.log(111);
+											}
+										}
+									})
+
+									form.on('submit(edit)', function(data) {
+										//console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+										//console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+										console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+										//调用父窗口的layer对象
+										//console.log(id);
+										$.ajax({
+											type:"put",
+											url:"users/updatePass",
+											async:true,
+											data:{
+												password:data.field.oldpassword,
+												newpassword:data.field.newpassword
+											},
+											success:function(data){
+												if(data.result == 'success'){
+													
+													layerTips.msg('修改成功');
+													location.reload();
+													return;
+												}
+												else if (data.result == 'timeout'){
+													layerTips.alert('登录已过期', {
+															            skin: 'layui-layer-molv' //样式类名
+															            ,closeBtn: 0
+															        }, function(){
+															            window.location.href = "login.html";
+															        });
+												}
+												else if (data.result == 'failed'){
+													layerTips.msg('旧密码错误');
+													return false;
+												}
+											}
+										});
+										
+										
+										return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。									
+									});
+									//console.log(layero, index);
+								},
+								end: function() {
+									addBoxIndex = -1;
+								}
+							});
+						});
+					})
+					
+					//var addBoxIndex1 = -1;
+					$('#modifyInformation').click(function() {
+						if(addBoxIndex !== -1)
+							return;
+						$.get('temp/edit-infromation.html', null, function(form) {
+							addBoxIndex = layer.open({
+								type: 1,
+								title: '个人信息',
+								content: form,
+								btn: ['保存', '取消'],
+								shade: false,
+								offset: ['100px', '30%'],
+								area: ['500px', '440px'],
+								zIndex: 19890000,
+								maxmin: true,
+								yes: function(index) {
+									//触发表单的提交事件
+									$('form.layui-form').find('button[lay-filter=edit]').click();
+								},
+								full: function(elem) {
+									var win = window.top === window.self ? window : parent.window;
+									$(win).on('resize', function() {
+										var $this = $(this);
+										elem.width($this.width()).height($this.height()).css({
+											top: 0,
+											left: 0
+										});
+										elem.children('div.layui-layer-content').height($this.height() - 95);
+									});
+								},
+								success: function(layero, index) {
+									//console.log(layui);
+									//弹出窗口成功后渲染表单
+									var form = layui.form();
+									$.ajax({
+										type:"get",
+										url:"users/getUserInformation",
+										async:true,
+										success:function(data){
+											console.log(data);
+											if(data.username == 'timeout'){
+												layerTips.alert('登录已过期', {
+															            skin: 'layui-layer-molv' //样式类名
+															            ,closeBtn: 0
+															        }, function(){
+															            window.location.href = "login.html";
+															        });
+											}
+											else{
+												$('#name').val(data.name);
+												$('#qq').val(data.qq);
+												$('#student').prop('checked',data.student);
+												$('#school').val(data.school);
+												$('#number').val(data.number);
+												form.render();
+											}
+										}
+									});
+									
+									$('#getValicode').click(function(event){
+										event.preventDefault();
+										if(!$('#number').val()) {
+											layerTips.alert('请填写正确的手机号')
+											$('#number')[0].focus();
+											return;
+										}
+										if(!checkNumber($('#number').val())){
+											layerTips.alert('请填写正确的手机号');
+											$('#number')[0].focus();
+											return;
+										}
+										$.ajax({
+											type:"get",
+											url:"mobileCode/generationCode",
+											async:true,
+											data:{
+												number:$('#number').val()
+											},
+											success:function(data){
+												if(data.result =='exists'){
+													layerTips.alert('同一个手机号两分钟内不能重复发送');
+												}
+												
+												else if (data.result == 'numberExists'){
+													layerTips.alert('该手机号已注册');
+												}
+												else if (data.result == 'success'){
+													time(document.getElementById("getValicode"));
+												}
+											}
+										});
+									})
+
+									form.render();
+									
+									
+
+									form.on('submit(edit)', function(data) {
+										//console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+										//console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+										console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+										//调用父窗口的layer对象
+										//console.log(id);
+										$.ajax({
+											type:"put",
+											url:"users/updateInformation",
+											async:true,
+											data:data.field,
+											success:function(data){
+												if(data.result == 'success'){
+													
+													layerTips.msg('修改成功');
+													location.reload();
+													return;
+												}
+												else if (data.result == 'timeout'){
+													layerTips.alert('登录已过期', {
+															            skin: 'layui-layer-molv' //样式类名
+															            ,closeBtn: 0
+															        }, function(){
+															            window.location.href = "login.html";
+															        });
+												}
+												else if (data.result == 'codeerr'){
+													layerTips.msg('手机验证码错误');
+													return false;
+												}
+											}
+										});
+										
+										
+										return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。									
+									});
+									//console.log(layero, index);
+								},
+								end: function() {
+									addBoxIndex = -1;
+								}
+							});
+						});
+					})
+
+					$('#video1').on('click', function() {
+						layer.open({
+							title: 'YouTube',
+							maxmin: true,
+							type: 2,
+							content: 'video.html',
+							area: ['800px', '500px']
+						});
+					});
+					$('#pay').on('click', function() {
+						layer.open({
+							title: false,
+							type: 1,
+							content: '<img src="images/xx.png" />',
+							area: ['500px', '250px'],
+							shadeClose: true
+						});
+					});
+
+				});
+				
+				function checkNumber(number) {
+				var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+				if(!myreg.test(number)) {
+
+					return false;
+				} else {
+					return true;
+				}
+			}
+
+			var wait = 120;
+
+			function time(o) {
+				if(wait == 0) {
+					o.removeAttribute("disabled");
+					o.innerText = "获取验证码";
+					wait = 120;
+				} else {
+					o.setAttribute("disabled", true);
+					o.innerText = "重新发送(" + wait + ")";
+					wait--;
+					setTimeout(function() {
+							time(o)
+						},
+						1000)
+				}
+			}
+			</script>
+		</div>
+	</body>
+
+</html>

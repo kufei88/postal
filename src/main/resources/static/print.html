@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+	</head>
+	<body>
+		<button onclick="doPrint()">打印</button>
+		<iframe style="display:none" id="printIframe" ></iframe>
+		<script>
+			$(document).ready(function(){
+				$('#printIframe').attr('src','getfile/201706300519108621.pdf');
+			          
+			 
+			});
+			//点击打印按钮，触发事件】
+			function doPrint(){
+			    $("#printIframe")[0].contentWindow.print();
+			}
+		</script>
+	</body>
+</html>

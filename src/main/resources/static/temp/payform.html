@@ -1,0 +1,103 @@
+
+<style>
+	.header{
+		padding: 5px 20px;
+		
+		
+	}
+	h1{
+		font-size: 24px;
+	}
+	.billinfo{
+		background-color: #f2f2f2;
+		height: 50px;
+		padding: 0 50px;
+		border: 1px solid #e4e4e4;
+	}
+	.billConetent{
+		margin-top: 5px;
+	}
+	.info{
+		float: right;
+		color: #8D8D8D;
+	}
+	#billSum{
+		float: right;
+	}
+	.payTab{
+		margin-top: 10px;
+	}
+	.layui-tab-title li{
+		width: 100px;
+	}
+	
+	.paylogo img{
+		width: 100px;
+	}
+	.layui-tab-item{
+		padding: 10px;
+		position: relative;
+	}
+	#qrcode{
+		left: 30%;
+		right: 30%;
+		top: 10px;
+		width: 100px;
+		position: absolute;
+	}
+	.codehint{
+		position: absolute;
+		width: 100px;
+		left: 30%;
+		top: 170px;
+	}
+	.codehint img{
+		width: 150px;
+	}
+</style>
+<body>
+	
+
+<div >
+	<div class="header">
+		<h1>收银台</h1>
+	</div>
+	<div class="billinfo">
+		<p class="billConetent">
+			<span id="billcode">订单编号</span>
+			<span id="billSum">应付金额</span>
+		</p>
+		<p class="info">
+			订单金额包括：包裹处理费、包装材料费、国际面单耗材费用及人工费用
+		</p>
+	</div>
+	<div class="payTab">
+		<div class="layui-tab layui-tab-card">
+		  <ul class="layui-tab-title">
+		    <li class="layui-this">微信支付</li>
+		    <li>支付宝支付</li>
+		    
+		  </ul>
+		  <div class="layui-tab-content" style="height: 220px;">
+		    <div class="layui-tab-item layui-show">
+		    	<div class="paylogo">
+		    		<img src="../images/WePayLogo.png"/>
+		    	</div>
+		    	<div id="qrcode">
+		    		
+		    	</div>
+		    	<div class="codehint">
+		    		<img src="../images/说明文字.png"/>
+		    	</div>
+		    </div>
+		    <div class="layui-tab-item">
+		    	<button class="layui-btn-big layui-btn" id="alipay">去付款</button>
+		    </div>
+		    
+		  </div>
+		</div>
+	</div>
+</div>
+
+
+

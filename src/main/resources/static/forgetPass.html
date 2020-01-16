@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>重置密码</title>
+
+		<link rel="stylesheet" href="css/register.css" />
+		<link rel="stylesheet" href="css/toast.css" />
+	</head>
+
+	<body>
+		<div class="header">
+			<div class="header-content">
+				<div class="logo-title">
+					重置密码
+				</div>
+				
+			</div>
+
+		</div>
+		<div class="main">
+			<div id="register-form" class="reg-form">
+				<div class="form-item">
+					<label class="caption">用  户  名</label>
+					<input type="text" id="form-account" class="field" name="username" placeholder="您的账户名和登录名" required="required" />
+				</div>
+				<div class="input-tip" id="account-tip"></div>
+				<div class="form-item">
+					<label class="caption">设置密码</label>
+					<input type="password" id="form-password" class="field" name="password" placeholder="建议至少使用两种字符组合" required="required" />
+				</div>
+				<div class="input-tip" id="pass-tip"></div>
+				<div class="form-item">
+					<label class="caption">确认密码</label>
+					<input type="password" id="form-repassword" class="field" name="repassword" placeholder="请再次输入密码" required="required" />
+				</div>
+				
+				<div class="input-tip"></div>
+				<div class="form-item">
+					<label class="caption">手机号</label>
+					<input type="text" id="form-number" class="field" name="number" placeholder="建议使用常用手机" required="required" />
+				</div>
+				<div class="input-tip" id="number-tip"></div>
+				<div class="form-item">
+					<label class="caption">手机验证码</label>
+					<input type="text" id="form-valicode" class="field" name="valicode" placeholder="请输入手机验证码" required="required" />
+					<button id="getValicode" class="btnValicode" type="button">获取验证码</button>
+				</div>
+				<div class="input-tip"></div>
+				<div>
+					<button class="btn-register" id="btnok">确定</button>
+				</div>
+			</div>
+		</div>
+		<!-- 你的HTML代码 -->
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/toast.js"></script>
+		<script>
+			//一般直接写在一个js文件中
+			$(function() {
+				$('#form-account').blur(function(){
+					if(!$('#form-account').val()) {
+						
+						$('#account-tip').html('请填写用户名');
+						return;
+					}
+					else{
+						$('#account-tip').html('');
+					}
+					
+					$.ajax({
+						type:"get",
+						url:"users/checkUsername/"+$('#form-account').val(),
+						async:true,
+						
+						success:function(data){
+							if(data.result == 'failed'){
+								$('#account-tip').html('');
+								
+							}
+							else{
+								$('#account-tip').html('该用户不存在');
+								return;
+							}
+						}
+					});
+				})
+				$('#form-password').blur(function(){
+					if(!$('#form-password').val()) {
+						$('#pass-tip').html('请填写密码');
+						return;
+					}
+					else{
+						$('#pass-tip').html('');
+					}
+				})
+				
+				$('#form-repassword').blur(function(){
+					if(!($('#form-password').val() == $('#form-repassword').val())) {
+						$('#repass-tip').html('两次密码输入不一致');
+						return;
+					}
+					else{
+						$('#repass-tip').html('');
+					}
+				})
+				
+				$('#form-number').blur(function(){
+					if(!$('#form-number').val()) {
+						$('#number-tip').html('请填写手机号');
+						return;
+					}
+					else{
+						$('#number-tip').html('');
+					}
+					if(!checkNumber($('#form-number').val())){
+						$('#number-tip').html('请填写正确的手机号');
+						return;
+					}
+					else{
+						$('#number-tip').html('');
+					}
+					$.ajax({
+						type:"get",
+						url:"users/checkNumber/"+$('#form-number').val(),
+						async:true,
+						
+						success:function(data){
+							if(data.result == 'failed'){
+								$('#number-tip').html('');
+								
+							}
+							else{
+								$('#number-tip').html('该手机号未注册');
+								return;
+							}
+						}
+					});
+				})
+				
+				$('#btnok').click(function() {
+				
+					if(!$('#form-account').val()) {
+						showMessage('请填写用户名');
+						$('#form-account')[0].focus();
+						return;
+					}
+					
+					if(!$('#form-password').val()) {
+						showMessage('请填写密码');
+						$('#form-password')[0].focus();
+						return;
+					}
+					if(!($('#form-password').val() == $('#form-repassword').val())) {
+						showMessage('两次密码输入不一致');
+						$('#form-password')[0].focus();
+						return;
+					}
+					$.ajax({
+						type:"put",
+						url:"users/forgetPass",
+						async:true,
+						data:{
+							
+							username:$('#form-account').val(),
+							password:$('#form-password').val(),
+							number:$('#form-number').val(),
+							numberCode:$('#form-valicode').val()
+						},
+						success:function(data){
+							
+							if(data.result == 'codeerr'){
+								showMessage('验证码错误');
+								$('#form-valicode')[0].focus();
+								return;
+							}
+							if(data.result == 'success'){
+								showMessage('修改成功');
+								window.location.href = 'login.html';
+							}
+						}
+					});
+				})
+				document.getElementById("getValicode").onclick = function() {
+					if(!$('#form-number').val()) {
+						showMessage('请填写手机号');
+						$('#form-number')[0].focus();
+						return;
+					}
+					if(!checkNumber($('#form-number').val())){
+						showMessage('请填写正确的手机号');
+						$('#form-number')[0].focus();
+						return;
+					}
+					$.ajax({
+						type:"get",
+						url:"mobileCode/forgetPassCode",
+						async:true,
+						data:{
+							number:$('#form-number').val(),
+							username:$('#form-account').val()
+						},
+						success:function(data){
+							if(data.result =='exists'){
+								showMessage('同一个手机号两分钟内不能重复发送');
+							}
+							else if (data.result == 'numberExists'){
+								showMessage('该用户名跟手机号不匹配');
+							}
+							else if (data.result == 'success'){
+								time(document.getElementById("getValicode"));
+							}
+						}
+					});
+					
+				}
+				
+			})
+
+			function checkNumber(number) {
+				var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+				if(!myreg.test(number)) {
+
+					return false;
+				} else {
+					return true;
+				}
+			}
+
+			var wait = 120;
+
+			function time(o) {
+				if(wait == 0) {
+					o.removeAttribute("disabled");
+					o.innerText = "获取验证码";
+					wait = 120;
+				} else {
+					o.setAttribute("disabled", true);
+					o.innerText = "重新发送(" + wait + ")";
+					wait--;
+					setTimeout(function() {
+							time(o)
+						},
+						1000)
+				}
+			}
+		</script>
+
+	</body>
+
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>订单明细</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="stylesheet" href="plugins/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/btable.css" />
+</head>
+<style>
+	a{
+		color: blue;
+	}
+	.layui-input-inline{
+		width: 100px;
+	}
+</style>
+
+<body style=" background-color: gainsboro;">
+
+    <div style="margin:0px; background-color: #FFF9EC; margin:0 10px;width: 2600px;height: 550px;">
+        <blockquote class="layui-elem-quote">
+            
+            <form class="layui-form" style="">
+                <div class="layui-form-item" style="margin:0;">
+                    <label class="layui-form-label">发件人</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="username" placeholder="支持模糊查询.." autocomplete="off" class="layui-input">
+                    </div>
+                    <label class="layui-form-label">国内物流单号</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="inlandCode" placeholder="支持模糊查询.." autocomplete="off" class="layui-input">
+                    </div>
+                    <label class="layui-form-label">发件单位</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="school" placeholder="支持模糊查询.." autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" style="padding:0;">
+                        <button lay-filter="search" class="layui-btn" lay-submit><i class="fa fa-search" aria-hidden="true"></i> 查询</button>
+                    </div>
+                </div>
+            </form>
+        </blockquote>  
+        <div id="content" style="width: 2600px;height: 550px;"></div>
+    </div>
+
+    <script type="text/javascript" src="plugins/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: 'js/',
+            v: new Date().getTime()
+        }).use(['btable', 'form','upload'], function () {
+            var btable = layui.btable(),
+                $ = layui.jquery,
+                layerTips = parent.layer === undefined ? layui.layer : parent.layer, //获取父窗口的layer对象
+                layer = layui.layer,//获取当前窗口的layer对象;
+                form = layui.form();
+
+            btable.set({
+                openWait: true,//开启等待框
+                elem: '#content',
+                url: 'sendApply/getMainSendApplyQuery', //数据源地址
+                pageSize: 14,//页大小
+                params: {//额外的请求参数
+                    t: new Date().getTime()
+                },
+                columns: [{ //配置数据列
+                    fieldName: '账号', //显示名称
+                    field: 'username', //字段名
+                    sortable: false //是否显示排序
+                }, {
+                    fieldName: '代发人姓名',
+                    field: 'name',
+                    sortable: false
+                }, {
+                    fieldName: '代发人手机号',
+                    field: 'number',
+                    sortable: false
+                }, {
+                    fieldName: '发件单位',
+                    field: 'school',
+                    sortable: false
+                }, {
+                    fieldName: '带电方式',
+                    field: 'electricity',
+                    sortable: false
+                }, {
+                    fieldName: '国内物流公司',
+                    field: 'inlandLogistics',
+                    sortable: false
+                }, {
+                    fieldName: '国内物流单号',
+                    field: 'inlandCode',
+                    sortable: false,
+                    format:function(id,obj){
+                    	return '<a href="#" class="follow" data-code="' + obj.inlandCode + '" data-logi="'+obj.inlandLogistics+'">'+obj.inlandCode+'</a>'
+                    }
+                }, {
+                    fieldName: '国际物流公司',
+                    field: 'interLogistics',
+                    sortable: false
+                }, {
+                    fieldName: '仓库信息',
+                    field: 'storage',
+                    sortable: false
+                }, {
+                    fieldName: '国际物流单号',
+                    field: 'interCode',
+                    sortable: false
+                }, {
+                    fieldName: '国际物流面单',
+                    field: 'interPDF',
+                    sortable: false,
+                    format: function (id, obj) {
+                        //id
+                        //console.log(id);
+                        //行数据对象
+                       // console.log(interPDF);
+                       if(obj.interPDF){
+                       		return '<a href="testDownload/'+obj.id+'">下载</a>'
+                       }
+                       else{
+                       		return '';
+                       }
+                        
+                        //返回值：格式化的纯文本或html文本
+                       // return obj.interPDF;
+                    }
+                }, {
+                    fieldName: '商品信息',
+                    field: 'goodsInfo',
+                    sortable: false
+                }, {
+                    fieldName: '委托日期',
+                    field: 'billdate',
+                    sortable: false
+                }, {
+                    fieldName: '订单状态',
+                    field: 'state',
+                    sortable: false
+                }, {
+                    fieldName: '支付情况',
+                    field: 'payState',
+                    sortable: false
+                }, {
+                    fieldName: '备注信息',
+                    field: 'memo',
+                    sortable: false
+                }, {
+                    fieldName: '处理说明',
+                    field: 'dealMemo',
+                    sortable: false
+                },{
+                    fieldName: '订单号',
+                    field: 'billcode',
+                    sortable: false
+                }],
+                even: true,//隔行变色
+                field: 'id', //主键ID
+                //skin: 'row',
+                checkbox: false,//是否显示多选框
+                paged: true, //是否显示分页
+                singleSelect: false, //只允许选择一行，checkbox为true生效
+                onSuccess: function ($elem) { //$elem当前窗口的jq对象
+                	$('.follow').click(function(){
+                		console.log($(this).data('logi'));
+                		$.ajax({
+                			type:"get",
+                			url:"sendApply/getFollow",
+                			async:true,
+                			data:{
+                				
+                				com:$(this).data('logi'),
+                				nu:$(this).data('code')
+                			},
+                			success:function(data){
+                				console.log(data);
+                				layer.open({
+                					type:2,
+                					content:data.result,
+                					area: ['600px', '400px']
+                				})
+                			}
+                		});
+                	})
+                    $elem.children('tr').each(function () {
+                        $(this).children('td:last-child').children('input').each(function () {
+                            var $that = $(this);
+                            var action = $that.data('action');
+                            var iid = $that.data('id');
+                            
+                            var electricity = $that.data('electricity');
+                            var inlandlogistics = $that.data('inlandlogistics');
+                            var inlandcode = $that.data('inlandcode');
+                            var interlogistics = $that.data('interlogistics');
+                            var storage = $that.data('storage');
+                            var intercode = $that.data('intercode');
+                            var interpdf = $that.data('interpdf');
+                            var goodsinfo = $that.data('goodsinfo');
+                            var memo = $that.data('memo');
+                             var addBoxIndex = -1;
+                            $that.on('click', function () {
+                                switch (action) {
+                                    case 'edit':
+                                    	if(addBoxIndex !== -1)
+											return;
+										//本表单通过ajax加载 --以模板的形式，当然你也可以直接写在页面上读取
+										$.get('temp/edit-form.html', null, function(form) {
+											addBoxIndex = layer.open({
+												type: 1,
+												title: '修改订单',
+												content: form,
+												btn: ['保存', '取消'],
+												shade: false,
+												offset: ['10px', '30%'],
+												area: ['600px', '570px'],
+												zIndex: 19950924,
+												maxmin: true,
+												yes: function(index) {
+													//触发表单的提交事件
+													$('form.layui-form').find('button[lay-filter=edit]').click();
+												},
+												full: function(elem) {
+													var win = window.top === window.self ? window : parent.window;
+													$(win).on('resize', function() {
+														var $this = $(this);
+														elem.width($this.width()).height($this.height()).css({
+															top: 0,
+															left: 0
+														});
+														elem.children('div.layui-layer-content').height($this.height() - 95);
+													});
+												},
+												success: function(layero, index) {
+													//console.log(layui);
+													//弹出窗口成功后渲染表单
+													var form = layui.form();
+													layui.upload({
+												    url: 'testUploadFile' //上传接口
+												    ,success: function(res){ //上传成功后的回调
+												      $('#filename').text(res.result);
+												      $('#interPDF').val(res.result);
+												    }
+												    });
+													$('#inlandcode').val(inlandcode);
+													$('#inlandlogistics').val(inlandlogistics);
+													if(electricity=='是'){
+														$('#ielectricity').attr('checked','checked');
+													}
+													
+													$('#iinternational').val(interlogistics);
+													$('#istorage').val(storage);
+													$('#interCode').val(intercode);
+													$('#interPDF').val(interpdf);
+													$('#filename').text(interpdf);
+													$('#goodsInfo').val(goodsinfo);
+													$('#memo').val(memo);
+													console.log(iid);
+													$('#iid').val(iid);
+													
+													form.render();
+													form.on('switch(switchTest)', function(data){
+													    if(this.checked){
+													    	$('#iinternational').html('<option >上海邮政小包</option>'+
+																'<option >上海邮政挂号小包</option>'+
+																'<option >DLE</option>');
+															$('#istorage').val('Wish邮上海仓');
+															form.render('select');
+													    }
+													    else{
+													    	$('#iinternational').html('<option >金华邮政小包</option>'+
+																'<option >金华邮政挂号小包</option>');
+															$('#istorage').val('Wish邮金华仓');
+															form.render('select');
+													    }
+													    
+													  });
+													
+													form.on('select(international)',function(data){
+													  	if ((data.value == '金华邮政小包')||(data.value == '金华邮政挂号小包')){
+													  		$('#istorage').val('Wish邮金华仓');
+													  	}
+													  	else if ((data.value == '上海邮政小包')||(data.value == '上海邮政挂号小包')){
+													  		$('#istorage').val('Wish邮上海仓');
+													  	}
+													  	else{
+													  		$('#istorage').val('零创邮代为联系物流公司收寄');
+													  	}
+													  	
+													  })
+													  
+													form.on('submit(edit)', function(data) {
+														//console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+														//console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+														console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+														//调用父窗口的layer对象
+														//console.log(id);
+														
+														$.ajax({
+															type:"put",
+															url:"sendApply/",
+															async:true,
+															data:data.field,
+															success:function(data2){
+																console.log(data2);
+																if(data2.result == 'timeout'){
+																	
+																	layerTips.alert('登录已过期', {
+															            skin: 'layui-layer-molv' //样式类名
+															            ,closeBtn: 0
+															        }, function(){
+															            window.location.href = "login.html";
+															        });
+																}
+																else if (data2.result == 'inlandCodeExists'){
+																	layerTips.msg('国内物流单号已存在');
+																	
+																	return;
+																}
+																else if (data2.result == 'interCodeExists'){
+																	layerTips.msg('国际物流单号已存在');
+																	
+																	return;
+																}
+																else if (data2.result == 'success'){
+																	
+																	layerTips.msg('修改成功');
+																	location.reload();
+																	return;
+																}
+																console.log(data2);
+															}
+														});
+														/*
+														layerTips.open({
+															title: '这里面是表单的信息',
+															type: 1,
+															content: JSON.stringify(data.field),
+															area: ['500px', '300px'],
+															btn: ['关闭并刷新', '关闭'],
+															yes: function(index, layero) {
+																layerTips.msg('你点击了关闭并刷新');
+																layerTips.close(index);
+																location.reload(); //刷新
+															}
+					
+														}); */
+														//这里可以写ajax方法提交表单
+														return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。									
+													});
+													//console.log(layero, index);
+												},
+												end: function() {
+													addBoxIndex = -1;
+												}
+											});
+										});
+                                        break;
+                                    case 'del': //删除
+                                        var id = $that.data('id');
+                                        //询问框
+                                        layerTips.confirm('是否确定要删除该订单？', { icon: 3, title: '系统提示' }, function (index) {
+                                            $.ajax({
+                                            	type:"delete",
+                                            	url:"sendApply/"+id,
+                                            	async:true,
+                                            	success:function(data){
+                                            		if(data.result == 'success'){
+                                            			$that.parent('td').parent('tr').remove();
+                                            			layerTips.msg('删除成功.');
+                                            		}
+                                            		else{
+                                            			layerTips.msg('删除失败.');
+                                            		}
+                                            	}
+                                            });
+                                            
+                                        });
+                                        break;
+                                    case 'follow':
+                                    	console.log(123);
+                                        break;
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+            btable.render();
+            //监听搜索表单的提交事件
+            form.on('submit(search)', function (data) {
+                btable.get(data.field);
+                return false;
+            });
+           
+            function editform(){
+            	
+            }
+            
+            $(window).on('resize', function (e) {
+                var $that = $(this);
+                $('#content').height($that.height() - 92);
+            }).resize();
+        });
+    </script>
+</body>
+
+</html>

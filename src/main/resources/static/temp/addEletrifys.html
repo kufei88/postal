@@ -1,0 +1,18 @@
+<div style="margin: 15px;">
+	<form class="layui-form">
+		<input type="hidden" name="id" id="electrifyid" value="1">
+		<div class="layui-form-item">
+			<label class="layui-form-label">带电方式</label>
+			<div class="layui-input-inline">
+				<input type="text" name="electrify" id="electrify" lay-verify="required" autocomplete="off" placeholder="请输入带电方式" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">级别</label>
+			<div class="layui-input-inline">
+				<input type="number" name="rank" id="rank" lay-verify="required" autocomplete="off" placeholder="请输入级别" class="layui-input">
+			</div>
+		</div>
+		<button lay-filter="edit" lay-submit style="display: none;"></button>
+	</form>
+</div>

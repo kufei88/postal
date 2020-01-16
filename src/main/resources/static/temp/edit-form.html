@@ -1,0 +1,98 @@
+<style>
+		.layui-form-label{
+			width: 100px;
+		}
+		.layui-input-inline{
+			width: 300px;
+		}
+	</style>
+<div style="margin: 15px;">
+	<form class="layui-form">
+		<div class="layui-form-item">
+					<label class="layui-form-label">国内物流单号</label>
+					<div class="layui-input-inline">
+						<input type="text" name="inlandCode" id="inlandcode" lay-verify="required" autocomplete="off" placeholder="请输入国内物流单号" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">国内物流公司</label>
+					<div class="layui-input-inline">
+						<select name="inlandLogistics" lay-filter="aihao" id="inlandlogistics">
+							
+							<option >顺风</option>
+							<option >圆通</option>
+							<option >申通</option>
+							<option >韵达</option>
+							<option >中通</option>
+							<option >百世汇通</option>
+							<option >天天</option>
+							<option >如风达</option>
+							<option >邮政国内</option>
+							<option >芝麻开门</option>
+							<option >其它</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">带电方式</label>
+					<div class="layui-input-inline">
+						<select name="electricity" lay-filter="ielectricity" id="electrifys">
+							<option>1</option>
+							
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">国际物流公司</label>
+					<div class="layui-input-inline">
+						<select name="interLogistics" id="iinternational" lay-filter="international">
+							
+							<option >金华邮政小包</option>
+							<option >金华邮政挂号小包</option>
+							
+							
+						</select>
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">仓库信息</label>
+					<div class="layui-input-inline">
+						<input type="text" name="storage" id="istorage"  class="layui-input" readonly="readonly" value="Wish邮金华仓">
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">国际物流单号</label>
+					<div class="layui-input-inline">
+						<input type="text" name="interCode" id="interCode" lay-verify="required" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">国际物流面单</label>
+					<div class="layui-input-inline">
+						<input type="file" name="interPDF" lay-type="file"  class="layui-upload-file"> 
+						<span id="filename"></span>
+						<input hidden="hidden" name="interPDF" id="interPDF" />
+					</div>
+					
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">商品信息</label>
+					<div class="layui-input-inline">
+						<input type="text" name="goodsInfo"  id="goodsInfo" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				
+				<div class="layui-form-item">
+					<label class="layui-form-label">备注信息</label>
+					<div class="layui-input-inline">
+						<input type="text" name="memo" id="memo"  autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<input type="hidden" id="iid" name="id">
+		<button lay-filter="edit" lay-submit style="display: none;"></button>
+	</form>
+</div>
